@@ -1,21 +1,291 @@
 
 import './App.css';
 import { NextUIProvider,  } from '@nextui-org/react';
-import {  Text, Progress,Button, Textarea,Checkbox, Spacer , Card, Popover , Radio} from '@nextui-org/react';
-
+import {  Text, Progress,Button,Checkbox, Spacer , Card, Popover , Radio, Loading,Grid,createTheme} from '@nextui-org/react';
 
 
 
 function App() {
+
+var Elevator = function(options) {
+
+    var body = null;
+
+    // Scroll vars
+    var animation = null;
+    var duration = null; // ms
+    var customDuration = false;
+    var startTime = null;
+    var startPosition = null;
+    var endPosition = 0;
+    var targetElement = null;
+    var verticalPadding = null;
+    var elevating = false;
+
+    var startCallback;
+    var mainAudio;
+    var endAudio;
+    var endCallback;
+
+    var that = this;
+    function easeInOutQuad(t, b, c, d) {
+        t /= d / 2;
+        if (t < 1) return c / 2 * t * t + b;
+        t--;
+        return -c / 2 * (t * (t - 2) - 1) + b;
+    }
+
+    function extendParameters(options, defaults) {
+        for (var option in defaults) {
+            var t =
+                options[option] === undefined && typeof option !== "function";
+            if (t) {
+                options[option] = defaults[option];
+            }
+        }
+        return options;
+    }
+
+    function getVerticalOffset(element) {
+        var verticalOffset = 0;
+        while (element) {
+            verticalOffset += element.offsetTop || 0;
+            element = element.offsetParent;
+        }
+
+        if (verticalPadding) {
+            verticalOffset = verticalOffset - verticalPadding;
+        }
+
+        return verticalOffset;
+    }
+
+    /**
+     * Main
+     */
+
+    // Time is passed through requestAnimationFrame, what a world!
+    function animateLoop(time) {
+        if (!startTime) {
+            startTime = time;
+        }
+
+        var timeSoFar = time - startTime;
+        var easedPosition = easeInOutQuad(
+            timeSoFar,
+            startPosition,
+            endPosition - startPosition,
+            duration
+        );
+
+        window.scrollTo(0, easedPosition);
+
+        if (timeSoFar < duration) {
+            animation = requestAnimationFrame(animateLoop);
+        } else {
+            animationFinished();
+        }
+    }
+
+
+    this.elevate = function() {
+        if (elevating) {
+            return;
+        }
+
+        elevating = true;
+        startPosition = document.documentElement.scrollTop || body.scrollTop;
+        updateEndPosition();
+
+        // No custom duration set, so we travel at pixels per millisecond. (0.75px per ms)
+        if (!customDuration) {
+            duration = Math.abs(endPosition - startPosition) * 1.5;
+        }
+
+        requestAnimationFrame(animateLoop);
+
+        // Start music!
+        if (mainAudio) {
+            mainAudio.play();
+        }
+
+        if (startCallback) {
+            startCallback();
+        }
+    };
+
+    function browserMeetsRequirements() {
+        return (
+            window.requestAnimationFrame &&
+            window.Audio &&
+            window.addEventListener
+        );
+    }
+
+    function resetPositions() {
+        startTime = null;
+        startPosition = null;
+        elevating = false;
+    }
+
+    function updateEndPosition() {
+        if (targetElement) {
+            endPosition = getVerticalOffset(targetElement);
+        }
+    }
+
+    function animationFinished() {
+        resetPositions();
+
+        // Stop music!
+        if (mainAudio) {
+            mainAudio.pause();
+            mainAudio.currentTime = 0;
+        }
+
+        if (endAudio) {
+            endAudio.play();
+        }
+
+        if (endCallback) {
+            endCallback();
+        }
+    }
+
+    function onWindowBlur() {
+        // If animating, go straight to the top. And play no more music.
+        if (elevating) {
+            cancelAnimationFrame(animation);
+            resetPositions();
+
+            if (mainAudio) {
+                mainAudio.pause();
+                mainAudio.currentTime = 0;
+            }
+
+            updateEndPosition();
+            window.scrollTo(0, endPosition);
+        }
+    }
+
+    function bindElevateToElement(element) {
+        if (element.addEventListener) {
+            element.addEventListener("click", that.elevate, false);
+        } else {
+            // Older browsers
+            element.attachEvent("onclick", function() {
+                updateEndPosition();
+                document.documentElement.scrollTop = endPosition;
+                document.body.scrollTop = endPosition;
+                window.scroll(0, endPosition);
+            });
+        }
+    }
+
+    function init(_options) {
+		// Take the stairs instead
+		if (!browserMeetsRequirements()) {
+			return;
+		}
+
+        // Bind to element click event.
+        body = document.body;
+
+        var defaults = {
+            duration: undefined,
+            mainAudio: false,
+            endAudio: false,
+            preloadAudio: true,
+            loopAudio: true,
+            startCallback: null,
+            endCallback: null
+        };
+
+        _options = extendParameters(_options, defaults);
+
+        if (_options.element) {
+            bindElevateToElement(_options.element);
+        }
+
+        if (_options.duration) {
+            customDuration = true;
+            duration = _options.duration;
+        }
+
+        if (_options.targetElement) {
+            targetElement = _options.targetElement;
+        }
+
+        if (_options.verticalPadding) {
+            verticalPadding = _options.verticalPadding;
+        }
+
+        window.addEventListener("blur", onWindowBlur, false);
+
+        if (_options.mainAudio) {
+            mainAudio = new Audio(_options.mainAudio);
+            mainAudio.setAttribute("preload", _options.preloadAudio);
+            mainAudio.setAttribute("loop", _options.loopAudio);
+        }
+
+        if (_options.endAudio) {
+            endAudio = new Audio(_options.endAudio);
+            endAudio.setAttribute("preload", "true");
+        }
+
+        if (_options.endCallback) {
+            endCallback = _options.endCallback;
+        }
+
+        if (_options.startCallback) {
+            startCallback = _options.startCallback;
+        }
+    }
+
+    init(options);
+  };
+  
+  const elevatoe = new Elevator({
+        mainAudio: './Music/elevator.mp3',
+    endAudio: './Music/ding.mp3'
+  })
+
+  const theme = createTheme({
+  type: "dark",
+  theme: {
+    colors: {
+
+      primaryLight: '$green200',
+      primaryLightHover: '$green300',
+      primaryLightActive: '$green400',
+      primaryLightContrast: '$green600',
+      primary: '#0072F5',
+      primaryBorder: '$green500',
+      primaryBorderHover: '$green600',
+      primarySolidHover: '$green700',
+      primarySolidContrast: '$white',
+      primaryShadow: '$green500',
+
+      gradient: 'linear-gradient(112deg, $blue100 -25%, $pink500 -10%, $purple500 80%)',
+      link: '#5E1DAD',
+
+      myColor: '#ff4ecd'
+
+
+    },
+    space: {},
+    fonts: {}
+  }
+})
   return (
-    <div className="App bg-black pt-20 md:px-40">
-      <NextUIProvider>
-        <div className="w-full flex justify-center ">
-        <img src="https://c.tenor.com/lfDHEnYIUk4AAAAC/this-is-where-the-fun-begins-star-wars.gif" alt="begin memes" classname="rounded-md"/></div>
+      <NextUIProvider theme={theme}>
+    <div className="App bg-black pt-20 md:px-40 ">
+        <div className="w-full flex justify-center rounded-md">
+        <img src="https://c.tenor.com/2cKVhhxhPLsAAAAC/the-social-network-watching-movie.gif" alt="begin memes" classname="cover"/></div>
 {/* Basic introduction  */}
         <div className="w-full    items-start flex px-6 flex-col justify-start  ">
           <Text h1 css={{ textGradient: "45deg, $blue600 -20%, $pink600 50%" }} className="text-start" > Blog #1 How I made my website  </Text>
-          <Text h5 color='secondary' className='text-start'> now what this blog post covers is how i made my website , what styling i used and what were the challenges i faced while making this website . this doesnt mean that i used just these things these are just the tools i think should be mentioned for you to understand if you want to make something like this from scratch . now  the hardness  level of this blog is 0 , or in your case entirely beginner friendly </Text>
+          <Text h5 color='secondary' className='text-start'> now what this blog post covers is how i made my website , what styling i used and what were the challenges i faced while making this website . this doesnt mean that i used just these things these are just the tools i think should be mentioned for you to understand if you want to make something like this from scratch . now  the hardness  level of this blog is 0 , or in your case entirely beginner friendly , alright then , take that cup of coffee ☕☕ and and lets begin</Text>
           <br />
           <Text h4 color="$green600">Reader Level  👶</Text>
           <Progress value={15} shadow color="success" size="xl" status="primary" /> 
@@ -106,7 +376,7 @@ export default function App() {\n
 
           </span>
           
-          <Text h5 color="warning" className="text-start">that saves time⏲️ precious to you and lets you focus on other things like optimisation and stuff that matter in the long run . now do you see the value of having something like React and not code these things  , think frameworks like react to be android  🤖(foreshadowing) play store . this allows you to choose your styling , make default styling and other stuff. now i also did some math 🧮 and translation on things which is jargon and things not fir for you rn 😕 .but dont be sad 😥😥😥 if you want to i will make an advanced page to this . and link to the page  ---&gt; here </Text>
+          <Text h5 color="warning" className="text-start">that saves time⏲️ precious to you and lets you focus on other things like optimisation and stuff that matter in the long run . now do you see the value of having something like React and not self code these things  , think frameworks like react to be android  🤖(foreshadowing) play store . this allows you to choose your styling , make default styling and other stuff. now i also did some math 🧮 and translation on things which is jargon and things not fir for you rn 😕 .but dont be sad 😥😥😥 if you want to i will make an advanced page to this . and link to the page  ---&gt; here </Text>
 
                     <Text h5 color="warning" className="text-start mt-6">hehehe
             But you know , in real world there are not improvements only choices , exchanges . in this case .
@@ -127,12 +397,40 @@ export default function App() {\n
 
     </Radio.Group>
 
+                    <Text h5 color="warning" className="text-start mt-6">We are exchanging speed  for rendering the website, but that's ok , becoz tailwind is special and helps us , ill explain how on seperate tailwind blog . Right now we need to talk about Animations with these styled components how i did it. 
+          </Text>
+          <br />
+          <br/>
+          <Text h2 css={{ textGradient: "45deg, $yellow500 -20%, $green600 50%" }} > Animations   </Text>
+                    <Text h5 color="$green600" className="text-start ">
+            Now im sure you might be wondering 🤔 why animations are important , there are many sites like Facebook and Instagram , with little to no animations , well my friend 💜 , they are using animations just under the hood !!! also arent animations fun like for example
+          </Text>
+
+            <Grid.Container gap={2}>
+      <Grid>
+        <Loading type="default" />
+      </Grid>
+      <Grid>
+        <Loading type="spinner" size="lg" />
+      </Grid>
+      <Grid>
+        <Loading type="points" />
+      </Grid>
+      <Grid>
+        <Loading type="points-opacity" />
+      </Grid>
+      <Grid>
+        <Loading type="gradient" />
+      </Grid>
+    </Grid.Container>
+          <Text h5 color="$green600" className="text-start ">
+            now there are many many good libraries that i suggest you look into . 
+            there are  libraries like  FRAMER MOTION 💣  , CSS Transition Group 🔫 but my favourite is probably React Spring 
+
+          </Text>
 
 
-
-
-
-
+          <Button onClick={()=>elevatoe.elevate()}>Lol</Button>
 
 </div>
 
@@ -140,10 +438,8 @@ export default function App() {\n
 
 
 
-
-
-      </NextUIProvider>
     </div>
+      </NextUIProvider>
   );
 }
 
