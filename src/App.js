@@ -21,7 +21,6 @@ function App() {
         <div className='flex items-center justify-center'>
         <div className='w-40'>
             <Progress value={15} shadow color="primary" status="primary" /></div></div>
-        
       </NextUIProvider>
     </div>
   );
