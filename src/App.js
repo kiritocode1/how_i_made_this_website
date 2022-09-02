@@ -106,7 +106,11 @@ export default function App() {\n
 
           </span>
           
-          <Text h5 color="warning" className="text-start">that saves time precious to you and lets you focus on other things like optimisation and stuff that matter in the long run . now do you see the value of having something like React and not code these things  , think frameworks like react to be android (foreshadowing) plahy store . this allows you to choose your styling , make default styling and other stuff </Text>
+          <Text h5 color="warning" className="text-start">that saves time precious to you and lets you focus on other things like optimisation and stuff that matter in the long run . now do you see the value of having something like React and not code these things  , think frameworks like react to be android (foreshadowing) play store . this allows you to choose your styling , make default styling and other stuff. now i also did some math and translation on things which is jargon and things not fir for you rn . if you want to i will make an advanced page to this . and link to the page  ---&gt; here </Text>
+
+                    <Text h5 color="warning" className="text-start mt-6">hehehe
+            But you know , in real world there are not improvements only choices , exchanges . in this case 
+          </Text>
 </div>
 
 
