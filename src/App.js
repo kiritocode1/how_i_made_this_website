@@ -1,7 +1,7 @@
 
 import './App.css';
 import { NextUIProvider,  } from '@nextui-org/react';
-import {  Text, Progress,Button, Textarea,Checkbox, Spacer , Card, Popover} from '@nextui-org/react';
+import {  Text, Progress,Button, Textarea,Checkbox, Spacer , Card, Popover , Radio} from '@nextui-org/react';
 
 
 
@@ -35,7 +35,7 @@ function App() {
     /></div>
           <Text h2 css={{ textGradient: "45deg, $red600 -20%, $yellow600 50%" }} >Styling </Text>
           <Text h5 color='warning' className='text-start'>Now i Know that styling needed to be appealing so
-            i imported many libraries and used many styling objects including MUi , 
+            i imported many libraries 📚 and used many styling objects including MUi , 
             usesounds and 
             daisyui all of these concepts deserve their own blog posts but all you need to know right now is that these help us do some amazing things that a developer cannot do alone . like say for example i want a customised button and stying . look how easy it is to create a button using something like daisyui 
           
@@ -106,11 +106,34 @@ export default function App() {\n
 
           </span>
           
-          <Text h5 color="warning" className="text-start">that saves time precious to you and lets you focus on other things like optimisation and stuff that matter in the long run . now do you see the value of having something like React and not code these things  , think frameworks like react to be android (foreshadowing) play store . this allows you to choose your styling , make default styling and other stuff. now i also did some math and translation on things which is jargon and things not fir for you rn . if you want to i will make an advanced page to this . and link to the page  ---&gt; here </Text>
+          <Text h5 color="warning" className="text-start">that saves time⏲️ precious to you and lets you focus on other things like optimisation and stuff that matter in the long run . now do you see the value of having something like React and not code these things  , think frameworks like react to be android  🤖(foreshadowing) play store . this allows you to choose your styling , make default styling and other stuff. now i also did some math 🧮 and translation on things which is jargon and things not fir for you rn 😕 .but dont be sad 😥😥😥 if you want to i will make an advanced page to this . and link to the page  ---&gt; here </Text>
 
                     <Text h5 color="warning" className="text-start mt-6">hehehe
-            But you know , in real world there are not improvements only choices , exchanges . in this case 
+            But you know , in real world there are not improvements only choices , exchanges . in this case .
           </Text>
+
+
+
+
+
+          <Radio.Group orientation="horizontal" defaultValue="primary"  >
+            
+            <Radio value="error" color="error" labelColor='error'>
+        Red Pill :  Clean Code 👓
+      </Radio>
+      <Radio value="primary" color="primary" labelColor="primary">
+        Blue pill : Fast Code  🐇
+      </Radio>
+
+    </Radio.Group>
+
+
+
+
+
+
+
+
 </div>
 
 
