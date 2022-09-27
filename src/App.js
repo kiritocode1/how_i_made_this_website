@@ -309,7 +309,7 @@ var Elevator = function(options) {
           <Text h5 color='secondary' className='text-start'> now what this blog post covers is how i made my website , what styling i used and what were the challenges i faced while making this website . this doesnt mean that i used just these things these are just the tools i think should be mentioned for you to understand if you want to make something like this from scratch . now  the hardness  level of this blog is 0 , or in your case entirely beginner friendly , alright then , take that cup of coffee ☕☕ and and lets begin</Text>
           <br />
           <Text h4 color="$yellow700">Reader Level  👶</Text>
-          <Progress value={37} shadow color="warning" size="xl" status="primary" /> 
+          <Progress value={37} shadow color="warning" size="xl" status="warning" /> 
           <br/>
           <Text h2 css={{ textGradient: "45deg, $blue600 -20%, $pink600 50%" }} > Introduction   </Text>
           
