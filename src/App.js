@@ -5,7 +5,7 @@ import {  Text, Progress,Button,Checkbox, Spacer , Card, Popover , Radio, Loadin
 import { useSpring, animated as a } from "react-spring";
 import devops1 from "./pictures/devops1.png"
 import devops2 from "./pictures/devops2.png"
-
+import confetti from "canvas-confetti";
 function LoopObject() {
   const styles = useSpring({
     loop: { reverse: true },
@@ -563,7 +563,7 @@ export default function App() {\n
         
 
           <div className='w-full flex align-center justify-center my-20'>
-          <Button onClick={()=>elevatoe.elevate()} shadow color="accent" size='lg'> ☝️ Go back Up  ☝️</Button></div>
+            <Button onClick={() => { elevatoe.elevate(); confetti({spread:180 ,particleCount:300 }); }} shadow color="accent" size='lg'> ☝️ Celebrate + Go back Up  ☝️</Button></div>
         </div>
         
 
